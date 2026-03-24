@@ -1,13 +1,11 @@
 import asyncio
 import os
 import sys
+import logging
 from collections import defaultdict, deque
 import discord
 from dotenv import load_dotenv
-import logging
-
-# Import your functions module
-import cogs.functions as functions
+import core.functions as functions
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,14 +15,12 @@ history = defaultdict(lambda: deque(maxlen=50))
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-SERVER_API = os.getenv("ServerApi")
+SERVER_API = os.getenv("SERVER_API")
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-# Use discord.Client for LLM interface
 client = discord.Client(intents=intents)
-
 
 @client.event
 async def on_ready():
@@ -54,10 +50,10 @@ async def on_message(message):
         return
 
     # Generate memory key for conversation history
-    memory_key = functions.GetMemoryKey(message)
+    memory_key = functions.getMemoryKey(message)
 
     # Clean bot mentions from message
-    user_text = functions.CleanMention(message.content, client.user.id)
+    user_text = functions.cleanMention(message.content, client.user.id)
 
     # Check if bot should respond (mentioned, replied to, or in private message)
     should_respond = (
@@ -93,18 +89,16 @@ async def on_message(message):
             error_msg = "Sorry, I encountered an error processing your request."
             await message.channel.send(error_msg)
 
-
 @client.event
-async def on_error(event, *args, **kwargs):
+async def on_error(event):
     print(f"Bot error in {event}: {sys.exc_info()}")
 
-
-async def connect_with_retry(client, token, max_retries=5):
+async def connect_with_retry(client_, token, max_retries=5):
     """Attempt to connect with retry logic and better error handling"""
     for attempt in range(max_retries):
         try:
             print(f"Connection attempt {attempt + 1}/{max_retries}")
-            await client.start(token)
+            await client_.start(token)
             return True
         except discord.errors.DiscordServerError as e:
             if "503" in str(e) or "overflow" in str(e).lower():
@@ -125,14 +119,12 @@ async def connect_with_retry(client, token, max_retries=5):
             continue
     return False
 
-
 async def main():
     token = os.getenv('DISCORD_TOKEN')
     if not token:
         print("Error: DISCORD_TOKEN not found in environment variables!")
         print("Please check your .env file.")
         return
-
     try:
         print("Attempting to connect to Discord...")
         success = await connect_with_retry(client, token, max_retries=5)
@@ -145,7 +137,6 @@ async def main():
         print(f"Failed to start bot: {e}")
         import traceback
         traceback.print_exc()
-
 
 if __name__ == '__main__':
     try:
