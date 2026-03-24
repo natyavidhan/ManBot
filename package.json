@@ -1,0 +1,24 @@
+{
+  "name": "manbot-opendih",
+  "version": "1.0.0",
+  "description": "ManBot By OpenDih",
+  "homepage": "https://github.com/myrachane/ManBot-OpenDih#readme",
+  "bugs": {
+    "url": "https://github.com/myrachane/ManBot-OpenDih/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myrachane/ManBot-OpenDih.git"
+  },
+  "license": "ISC",
+  "author": "OpenDih",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main"
+  },
+  "dependencies": {
+    "discord.js": "^14.25.1"
+  },
+  "devDependencies": {}
+}
