@@ -54,10 +54,10 @@ async def on_message(message):
         return
 
     # Generate memory key for conversation history
-    memory_key = functions.GetMemoryKey(message)
+    memory_key = functions.getMemoryKey(message)
 
     # Clean bot mentions from message
-    user_text = functions.CleanMention(message.content, client.user.id)
+    user_text = functions.cleanMention(message.content, client.user.id)
 
     # Check if bot should respond (mentioned, replied to, or in private message)
     should_respond = (
@@ -95,16 +95,16 @@ async def on_message(message):
 
 
 @client.event
-async def on_error(event, *args, **kwargs):
+async def on_error(event):
     print(f"Bot error in {event}: {sys.exc_info()}")
 
 
-async def connect_with_retry(client, token, max_retries=5):
+async def connect_with_retry(client_, token, max_retries=5):
     """Attempt to connect with retry logic and better error handling"""
     for attempt in range(max_retries):
         try:
             print(f"Connection attempt {attempt + 1}/{max_retries}")
-            await client.start(token)
+            await client_.start(token)
             return True
         except discord.errors.DiscordServerError as e:
             if "503" in str(e) or "overflow" in str(e).lower():
